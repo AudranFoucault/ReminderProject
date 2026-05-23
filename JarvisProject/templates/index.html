@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+h1 {text-align: center;}
+h2 {text-align: center;}
+body {
+    text-align: center;
+}
+.div {
+    width: 200px;
+    height: 500px;
+    border: 1px black solid;
+    margin: left;
+}
+.box {
+    width: 500px;
+    height: 200px;
+    border: 1px black solid;
+    margin: auto;
+}
+
+</style>
+</head>
+<body>
+    <h1>REMINDR</h1>
+    <h2>Your Everyday Reminder</h2>
+    <input id="input" placeholder="Remind me about...">
+    <button type="button" id="button">REMIND ME</button>
+     <div class="box" id="box"></div>
+     <div class="div" id="boxtwo"></div>    
+<script>   
+    const button = document.querySelector("#button");
+    const input = document.querySelector("#input");
+    const box = document.querySelector("#box");
+    const btn = document.createElement("button");
+    
+
+    button.addEventListener("click", async () => {
+        const response = await fetch('http://127.0.0.1:5000/add', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({response: input.value}),
+        })
+        const text = await response.json()
+        box.innerHTML = ""
+        text.forEach(reminder, index => {
+            box.innerHTML +=`${reminder.REMINDER} - ${reminder.DATE}`
+            const btn = document.createElement("button")
+            btn.textContent = "Delete";
+            container.appendChild(btn)
+        })
+     })
+    const container = document.getElementById("box");
+    window.addEventListener("load", async (event)=> {
+        const response = await fetch('http://127.0.0.1:5000/read_reminders', {
+            method: "GET",
+        })
+        const data = await response.json()
+        box.innerHTML = ""
+        data.forEach((reminder, index) => {
+            const p = document.createElement("p")
+            p.textContent = reminder.REMINDER + "-" + reminder.DATE;
+            box.appendChild(p);
+            const btn = document.createElement("button")
+            btn.textContent = "Delete";
+            container.appendChild(btn)
+            btn.addEventListener("click", async () => {
+                const response = await fetch('http://127.0.0.1:5000/delete', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({index: index}),       
+                })
+            })
+        })  
+    })
+
+
+
+</script>
+</body>
+</html>
